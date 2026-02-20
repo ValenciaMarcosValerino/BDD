@@ -1,0 +1,30 @@
+/*Tarea con with select pal profe*/
+;with r as (                /*Alumnos aprobados*/
+select distinct c.boleta, c.clave
+from escuela.cursa c
+join escuela.Imparte i
+on c.clave = i.clave
+where i.numEmpleado = 'P0000001'
+and c.calif >= 6),
+
+s as( /*materias que ha impartido el profesor*/
+    select distinct clave
+    from escuela.Imparte
+    where numEmpleado = 'P0000001'),
+rxs as(/**/
+   select a.boleta, s.clave
+        from (select distinct boleta from r) a/*materias que el alumno ya aprobo por el profesor, obtengo el conjunto de alumnos que hayan pasado al menos una materia con el profesor*/
+        cross join S), /*las materias que el profesor imparte mi cross join hace un producto cartesiano*/
+rxr_r as ( /**/
+ select tc.boleta, tc.clave
+        from rxs tc
+	    where not exists (select 1
+	                      from r
+					      where tc.boleta = r.boleta 
+					      and tc.clave = r.clave))
+
+select boleta
+from r
+except
+select boleta 
+from rxs_r;
